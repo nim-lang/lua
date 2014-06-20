@@ -1,7 +1,7 @@
 # Embedds Lua into a Nimrod application
 
 import
-  lua, lualib, lauxlib
+  lua
 
 const
   code = """
