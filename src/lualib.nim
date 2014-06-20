@@ -19,46 +19,48 @@
 #**   In french or in english
 #
 
-import 
-  lua
+{.warning: "lualib.nim is deprecated".}
+when false:
+  import 
+    lua
 
-const 
-  COLIBNAME* = "coroutine"
-  TABLIBNAME* = "table"
-  IOLIBNAME* = "io"
-  OSLIBNAME* = "os"
-  STRLINAME* = "string"
-  MATHLIBNAME* = "math"
-  DBLIBNAME* = "debug"
-  LOADLIBNAME* = "package"
+  const 
+    COLIBNAME* = "coroutine"
+    TABLIBNAME* = "table"
+    IOLIBNAME* = "io"
+    OSLIBNAME* = "os"
+    STRLINAME* = "string"
+    MATHLIBNAME* = "math"
+    DBLIBNAME* = "debug"
+    LOADLIBNAME* = "package"
 
-{.pragma: ilua, importc: "lua$1".}
+  {.pragma: ilua, importc: "lua$1".}
 
-{.push callConv: cdecl, dynlib: lua.LIB_NAME.}
-proc open_base*(L: PState): cint{.ilua.}
-proc open_table*(L: PState): cint{.ilua.}
-proc open_io*(L: PState): cint{.ilua.}
-proc open_string*(L: PState): cint{.ilua.}
-proc open_math*(L: PState): cint{.ilua.}
-proc open_debug*(L: PState): cint{.ilua.}
-proc open_package*(L: PState): cint{.ilua.}
-proc openlibs*(L: PState){.importc: "luaL_openlibs".}
-{.pop.}
+  {.push callConv: cdecl, dynlib: lua.LIB_NAME.}
+  proc open_base*(L: PState): cint{.ilua.}
+  proc open_table*(L: PState): cint{.ilua.}
+  proc open_io*(L: PState): cint{.ilua.}
+  proc open_string*(L: PState): cint{.ilua.}
+  proc open_math*(L: PState): cint{.ilua.}
+  proc open_debug*(L: PState): cint{.ilua.}
+  proc open_package*(L: PState): cint{.ilua.}
+  proc openlibs*(L: PState){.importc: "luaL_openlibs".}
+  {.pop.}
 
-proc baselibopen*(L: PState): Bool = 
-  open_base(L) != 0'i32
+  proc baselibopen*(L: PState): Bool = 
+    open_base(L) != 0'i32
 
-proc tablibopen*(L: PState): Bool = 
-  open_table(L) != 0'i32
+  proc tablibopen*(L: PState): Bool = 
+    open_table(L) != 0'i32
 
-proc iolibopen*(L: PState): Bool = 
-  open_io(L) != 0'i32
+  proc iolibopen*(L: PState): Bool = 
+    open_io(L) != 0'i32
 
-proc strlibopen*(L: PState): Bool = 
-  open_string(L) != 0'i32
+  proc strlibopen*(L: PState): Bool = 
+    open_string(L) != 0'i32
 
-proc mathlibopen*(L: PState): Bool = 
-  open_math(L) != 0'i32
+  proc mathlibopen*(L: PState): Bool = 
+    open_math(L) != 0'i32
 
-proc dblibopen*(L: PState): Bool = 
-  open_debug(L) != 0'i32
+  proc dblibopen*(L: PState): Bool = 
+    open_debug(L) != 0'i32
