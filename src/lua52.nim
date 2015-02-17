@@ -14,6 +14,7 @@ const
 ##define LUA_COPYRIGHT	LUA_RELEASE "  Copyright (C) 1994-2012 Lua.org, PUC-Rio"
 ##define LUA_AUTHORS	"R. Ierusalimschy, L. H. de Figueiredo, W. Celes"
 
+#{.deadCodeElim: on.}
 when defined(useLuaJIT): 
   {.warning: "Lua JIT does not support Lua 5.2 at this time."}
 
@@ -406,7 +407,7 @@ proc setupvalue*(L: PState; funcindex: cint; n: cint): cstring {.ilua.}
 proc upvalueid*(L: PState; fidx: cint; n: cint): pointer {.ilua.}
 proc upvaluejoin*(L: PState; fidx1: cint; n1: cint; fidx2: cint; 
                       n2: cint) {.ilua.}
-proc sethook*(L: PState; func: lua_Hook; mask: cint; count: cint): cint {.ilua.}
+proc sethook*(L: PState; fn: lua_Hook; mask: cint; count: cint): cint {.ilua.}
 proc gethook*(L: PState): lua_Hook {.ilua.}
 proc gethookmask*(L: PState): cint {.ilua.}
 proc gethookcount*(L: PState): cint {.ilua.}
@@ -500,7 +501,7 @@ const
 type 
   luaL_Reg* = tuple[ 
     name: cstring,
-    func: TCFunction]
+    fn: TCFunction]
 
 ### IMPORT FROM "luaL_$1"
 proc checkversion*(L: PState; ver: lua_Number) {.importc: "luaL_checkversion_".}
@@ -540,7 +541,9 @@ proc `ref`*(L: PState; t: cint): cint {.iluaL.}
 proc unref*(L: PState; t: cint; `ref`: cint) {.iluaL.}
 proc loadfilex*(L: PState; filename: cstring; mode: cstring): cint {.iluaL.}
 template luaL_loadfile*(L, f: expr): expr = 
-  luaL_loadfilex(L, f, nil)
+  loadfilex(L, f, nil)
+proc loadfile* (state: PState; filename: cstring): cint =
+  loadfilex(state, filename, nil)
 
 proc loadbufferx*(L: PState; buff: cstring; sz: csize; name: cstring; 
                   mode: cstring): cint {.iluaL.}
@@ -587,6 +590,10 @@ template luaL_typename*(L, i: expr): expr =
 
 template luaL_dofile*(L, fn: expr): expr = 
   (luaL_loadfile(L, fn) or lua_pcall(L, 0, LUA_MULTRET, 0))
+proc dofile* (state: PState; file:cstring): cint =
+  result = loadfile(state, file) 
+  if result == 0:
+    result = pcall(state, 0, LUA_MULTRET, 0)
 
 template luaL_dostring*(L, s: expr): expr = 
   (luaL_loadstring(L, s) or lua_pcall(L, 0, LUA_MULTRET, 0))
@@ -599,7 +606,8 @@ template luaL_opt*(L, f, n, d: expr): expr =
 
 template luaL_loadbuffer*(L, s, sz, n: expr): expr = 
   luaL_loadbufferx(L, s, sz, n, nil)
-
+proc loadbuffer*(L: PState; buff: cstring; sz: csize; name: cstring): cint =
+  loadbufferx(L, buff, sz, name, nil)
 
 #
 #@@ TBufferSIZE is the buffer size used by the lauxlib buffer system.
@@ -709,8 +717,9 @@ when isMainModule:
     L.setGlobal "testFunc"
 
     const LuaScript = "testFunc()"
-    echo "Loading script: \"\"\"\L$1\L\"\"\"".format(luaScript)
-    let result = L.loadString (luaScript) . TThreadStatus
+    echo "Loading script: \"\"\"\L$1\L\"\"\"".format(LuaScript)
+    
+    let result = L.loadString(LuaScript).TThreadStatus
     echo "return: ", result
 
     if result == Thread_OK:
