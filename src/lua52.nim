@@ -290,19 +290,27 @@ proc setallocf*(L: PState; f: TAlloc; ud: pointer) {.ilua.}
 #* ===============================================================
 #
 template lua_tonumber*(L, i: expr): expr = 
-  lua_tonumberx(L, i, nil)
+  tonumberx(L, i, nil)
+proc tonumber* (state:PState; i:cint): lua_Number =
+  tonumberx(state, i, nil)
 
 template lua_tointeger*(L, i: expr): expr = 
-  lua_tointegerx(L, i, nil)
+  tointegerx(L, i, nil)
+proc tointeger* (state: PState; i: cint): lua_Integer =
+  tointegerx(state, i, nil)
 
 template lua_tounsigned*(L, i: expr): expr = 
   lua_tounsignedx(L, i, nil)
 
 template lua_pop*(L, n: expr): expr = 
-  lua_settop(L, - (n) - 1)
+  settop(L, - (n) - 1)
+proc pop* (state: PState; n: cint) =
+  settop(state, -n - 1)
 
 template lua_newtable*(L: expr): expr = 
-  lua_createtable(L, 0, 0)
+  createtable(L, 0, 0)
+proc newtable* (state: PState) =
+  createtable(state, 0,0)
 
 ##define lua_register(L,n,f) (lua_pushcfunction(L, (f)); lua_setglobal(L, (n)))
 proc pushcfunction* (L: PState; fn: TCfunction) {.inline.} = L.pushCclosure(fn, 0)
@@ -313,27 +321,43 @@ template lua_pushcfunction*(L, f: expr): expr =
 
 template lua_isfunction*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TFUNCTION)
+proc isfunction* (state: PState; n: cint): bool =
+  lua_type(state,n) == LUA_TFUNCTION
 
 template lua_istable*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TTABLE)
+proc istable* (state: PState; n: cint): bool=
+  lua_type(state,n) == LUA_TTABLE
 
 template lua_islightuserdata*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TLIGHTUSERDATA)
+proc islightuserdata* (state: PState; n: cint): bool =
+  lua_type(state,n) == LUA_TLIGHTUSERDATA
 
 template lua_isnil*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TNIL)
+proc isnil* (state: PState; n: cint): bool =
+  lua_type(state, n) == LUA_TNIL
 
 template lua_isboolean*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TBOOLEAN)
+proc isboolean* (state: PState; n: cint): bool =
+  lua_type(state,n) == LUA_TBOOLEAN
 
 template lua_isthread*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TTHREAD)
+proc isthread* (state: PState; n: cint): bool =
+  lua_type(state,n) == LUA_TTHREAD
 
 template lua_isnone*(L, n: expr): expr = 
   (lua_type(L, (n)) == LUA_TNONE)
+proc isnone* (state: PState; n: cint): bool =
+  lua_type(state,n) == LUA_TNONE
 
 template lua_isnoneornil*(L, n: expr): expr = 
   (lua_type(L, (n)) <= 0)
+proc isnoneornil* (state: PState; n: cint): bool =
+  lua_type(state,n) <= 0
 
 template lua_pushliteral*(L, s: expr): expr = 
   lua_pushlstring(L, s, (sizeof(s) div sizeof(char)) - 1)
@@ -341,8 +365,12 @@ template lua_pushliteral*(L, s: expr): expr =
 template lua_pushglobaltable*(L: expr): expr = 
   lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS)
 
+
 template lua_tostring*(L, i: expr): expr = 
-  lua_tolstring(L, (i), nil)
+  tolstring(L, (i), nil)
+proc tostring* (state: PState; index: cint): cstring =
+  tolstring(state, index, nil)
+
 
 #
 #* {======================================================================
