@@ -580,7 +580,7 @@ proc getn(state: PState, n: cint): cint =
 
 proc setn(state: PState, t, n: cint) = 
   # does nothing as this operation is deprecated
-  nil
+  discard
 
 proc open(): PState = 
   result = newstate()
