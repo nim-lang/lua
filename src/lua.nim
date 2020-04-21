@@ -272,7 +272,7 @@ type
     nups*: cint                # (u) number of upvalues 
     linedefined*: cint         # (S) 
     lastlinedefined*: cint     # (S) 
-    short_src*: array[0.. <IDSIZE, char] # (S) \ 
+    short_src*: array[IDSIZE, char] # (S) \ 
                                # private part 
     i_ci*: cint                # active function 
   
