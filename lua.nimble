@@ -1,11 +1,8 @@
-[Package]
-name: "lua"
-version: "1.0"
-author: "Andreas Rumpf"
-description: "Wrapper to interface with the Lua interpreter"
-license: "MIT"
+version = "1.0"
+author = "Andreas Rumpf"
+description = "Wrapper to interface with the Lua interpreter"
+license = "MIT"
 
-srcDir: "src"
+srcDir = "src"
 
-[Deps]
-requires: "nim >= 0.10.2"
+requires "nim >= 1.0.0"
